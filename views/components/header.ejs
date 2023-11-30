@@ -1,0 +1,22 @@
+<header class="mb-auto">
+  <div>
+    <h3 class="float-md-start mb-0"><a style="text-decoration: none; color: white;" href="/">X-System</a></h3>
+    <% if (user) { %>
+     <div class="d-flex justify-content-evenly align-items-center">
+      <p class="m-0">welcome: <%= user.email %></p>
+      <a class="btn btn-light fw-bold" href="/signout">Sign out</a>
+     </div>
+    <% } else {%>
+    <nav class="nav nav-masthead justify-content-center float-md-end">
+      <a class="btn <%= currentPage===" login"? "btn-light" : null %> fw-bold"
+        aria-current="page"
+        href="/login">Log in</a>
+      <a class="btn <%= currentPage===" signup"? "btn-light" : null %> fw-bold" href="/signup">Sign up</a>
+    </nav>
+    <% } %>
+  </div>
+</header>
+
+
+
+

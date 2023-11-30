@@ -263,7 +263,7 @@ const user_add_get = (req, res) => {
 const user_post = (req, res) => {
   User.create(req.body)
     .then(() => {
-      res.redirect("/");
+      res.redirect("/home");
     })
     .catch((err) => {
       console.log(err);
@@ -286,13 +286,13 @@ const user_edit_get = (req, res) => {
 
 const user_delete = (req, res) => {
   User.deleteOne({ _id: req.params.id }).then((result) => {
-    res.redirect("/");
+    res.redirect("/home");
   });
 };
 
 const user_put = (req, res) => {
   User.updateOne({ _id: req.params.id }, req.body).then(() => {
-    res.redirect("/");
+    res.redirect("/home");
   });
 }
 

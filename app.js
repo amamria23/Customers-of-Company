@@ -10,6 +10,7 @@ app.use(methodOverride("_method"));
 const allRoutes = require("./routes/allRoutes");
 const editRoutes = require("./routes/editRoutes");
 const addUserRoutes = require("./routes/addUserRoutes");
+var cookieParser = require("cookie-parser");
 
 //Auto refresh
 const path = require("path");
@@ -39,7 +40,7 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-
+app.use(cookieParser());
 app.use("/", allRoutes);
 app.use("/edit/", editRoutes);
 app.use("/user/", addUserRoutes);
