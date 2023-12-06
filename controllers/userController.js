@@ -1,4 +1,8 @@
 const User = require("../models/customerSchema");
+const UserAuth = require("../models/userauth");
+const bcrypt = require("bcrypt");
+var jwt = require("jsonwebtoken");
+const { check, validationResult } = require("express-validator");
 const moment = require("moment");
 var country_list = [
   "Afghanistan",
@@ -294,7 +298,61 @@ const user_put = (req, res) => {
   User.updateOne({ _id: req.params.id }, req.body).then(() => {
     res.redirect("/home");
   });
-}
+};
+
+const user_welcome_get = (req, res) => {
+  res.render("welcome", { mytitle: "Welcome", currentPage: "welcome" });
+};
+
+const user_signup_get = (req, res) => {
+  res.render("signup", { mytitle: "Sign up", currentPage: "signup" });
+};
+
+const user_signup_post = async (req, res) => {
+  try {
+    const objError = validationResult(req);
+    console.log(objError.errors);
+
+    if (objError.errors.length > 0) {
+      return res.json({ validatorInput: objError.errors });
+    }
+    const isCurrentEmail = await UserAuth.findOne({ email: req.body.email });
+    if (isCurrentEmail) {
+      return res.json({ currentEmail: "Email already exist" });
+    }
+    const result = await UserAuth.create(req.body);
+    var token = jwt.sign({ id: result._id }, process.env.user_secret);
+    res.cookie("jwt", token, { httpOnly: true, maxAge: 86400000 });
+    res.json({ id: result._id });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const user_login_get = (req, res) => {
+  res.render("login", { mytitle: "Log in", currentPage: "login" });
+};
+
+const user_login_post = async (req, res) => {
+  const objError = validationResult(req);
+  if (objError.errors.length > 0) {
+    return res.json({ validatorInput: objError.errors });
+  }
+  const result = await UserAuth.findOne({ email: req.body.email });
+  if (result == null) {
+    res.json({ currentEmail: "wrong email" });
+  } else {
+    const match = await bcrypt.compare(req.body.password, result.password);
+    if (match) {
+      console.log("email and password are true");
+      var token = jwt.sign({ id: result._id }, process.env.user_secret);
+      res.cookie("jwt", token, { httpOnly: true, maxAge: 86400000 });
+      res.json({ id: result._id });
+    } else {
+      res.json({ currentPassword: "wrong password" });
+    }
+  }
+};
 
 module.exports = {
   user_index_get,
@@ -304,5 +362,10 @@ module.exports = {
   user_post,
   user_edit_get,
   user_delete,
-  user_put
+  user_put,
+  user_welcome_get,
+  user_signup_get,
+  user_signup_post,
+  user_login_get,
+  user_login_post
 };

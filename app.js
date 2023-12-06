@@ -11,6 +11,8 @@ const allRoutes = require("./routes/allRoutes");
 const editRoutes = require("./routes/editRoutes");
 const addUserRoutes = require("./routes/addUserRoutes");
 var cookieParser = require("cookie-parser");
+app.use(cookieParser());
+require('dotenv').config()
 
 //Auto refresh
 const path = require("path");
@@ -30,7 +32,7 @@ liveReloadServer.server.once("connection", () => {
 //connect to MongoDB
 mongoose
   .connect(
-    "mongodb+srv://ilyess29:ilyess23@cluster0.rtpjvtq.mongodb.net/bigData?retryWrites=true&w=majority"
+    process.env.user_mongo_connect
   )
   .then(() => {
     app.listen(port, () => {
@@ -40,7 +42,7 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
-app.use(cookieParser());
+app.use(express.json());
 app.use("/", allRoutes);
 app.use("/edit/", editRoutes);
 app.use("/user/", addUserRoutes);
