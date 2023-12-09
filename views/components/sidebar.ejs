@@ -1,73 +1,75 @@
-<div
-        id="sidebar"
-        class="sidebars flex-column flex-shrink-0 p-3 text-bg-dark position-relative"
-      >
-        <a
-          href="/"
-          class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none"
-        >
-          <svg
-            class="light bi pe-none me-2"
-            width="40"
-            height="32"
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            fill="currentColor"
-            class="bi bi-lightning-charge"
-            viewBox="0 0 16 16"
-          >
-            <path
-              d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z"
-            />
-          </svg>
-          <span class="fs-4">X-system</span>
-          <i id="back" class="bi bi-arrow-right-square"></i>
-          <i id="close" class="bi bi-x-circle"></i>
-        </a>
-        <hr />
-        <ul class="nav nav-pills flex-column mb-auto h-75">
-          <li class="nav-item">
-            <a href="/home" class="nav-link text-white <%= currentPage==="home"? "active": null %>" aria-current="page">
-              <svg class="bi pe-none me-2" width="16" height="16">
-                <use xlink:href="#home" />
-              </svg>
-              <span>Home</span>
-            </a>
-          </li>
+<div id="sidebar" class="sidebars flex-column flex-shrink-0 p-3 text-bg-dark position-relative">
+  <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+    <svg class="light bi pe-none me-2" width="40" height="32" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-lightning-charge" viewBox="0 0 16 16">
+      <path d="M11.251.068a.5.5 0 0 1 .227.58L9.677 6.5H13a.5.5 0 0 1 .364.843l-8 8.5a.5.5 0 0 1-.842-.49L6.323 9.5H3a.5.5 0 0 1-.364-.843l8-8.5a.5.5 0 0 1 .615-.09zM4.157 8.5H7a.5.5 0 0 1 .478.647L6.11 13.59l5.732-6.09H9a.5.5 0 0 1-.478-.647L9.89 2.41 4.157 8.5z" />
+    </svg>
+    <span class="fs-4">X-system</span>
+    <i id="back" class="bi bi-arrow-right-square"></i>
+    <i id="close" class="bi bi-x-circle"></i>
+  </a>
+  <hr />
+  <ul class="nav nav-pills flex-column mb-auto h-75">
+    <li class="nav-item">
+      <a href="/home" class="nav-link text-white <%= currentPage==="home"? "active" : null %>">
+        <svg class="bi pe-none me-2" width="16" height="16">
+          <use xlink:href="#home" />
+        </svg>
+        <span>Home</span>
+      </a>
+    </li>
 
-          <li class="nav-item">
-            <a href="../user/add.html" class="nav-link text-white <%= currentPage==="add"? "active": null %>">
-              <svg class="bi pe-none me-2" width="16" height="16">
-                <use xlink:href="#people-circle" />
-              </svg>
-              <span>Add Customers</span>
-            </a>
-          </li>
-        </ul>
-        <hr />
-        <div class="dropdown">
-          <a
-            href="#"
-            class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            <img
-              src="https://lh3.googleusercontent.com/a/ACg8ocJkKT1oly6oDlTi_SzAMB9EjozhflClBQ3vdwUq8V9PIM4=s288-c-no"
-              alt=""
-              width="32"
-              height="32"
-              class="rounded-circle me-2"
-            />
-            <strong><%= user.username %></strong>
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-            <li><a class="dropdown-item" href="#">New project...</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><hr class="dropdown-divider" /></li>
-            <li><a class="dropdown-item" href="/signout">Sign out</a></li>
-          </ul>
-        </div>
+    <li class="nav-item">
+      <a href="../user/add.html" class="nav-link text-white <%= currentPage==="add"? "active" : null %>">
+        <svg class="bi pe-none me-2" width="16" height="16">
+          <use xlink:href="#people-circle" />
+        </svg>
+        <span>Add Customers</span>
+      </a>
+    </li>
+  </ul>
+  <hr />
+  <div class="dropdown">
+    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      <img src="<%= user.profileImg?user.profileImg: "../img/avatar.png" %>" alt="" width="32" height="32" class="rounded-circle me-2" />
+      <strong>
+        <%= user.username %>
+      </strong>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+      <li><a class="dropdown-item" href="#">New project...</a></li>
+      <li><a class="dropdown-item" href="#">Settings</a></li>
+      <li><button data-bs-toggle="modal" data-bs-target="#exampleModal" class="dropdown-item" href="#">Profile
+          Image</button></li>
+      <li>
+        <hr class="dropdown-divider" />
+      </li>
+      <li><a class="dropdown-item" href="/signout">Sign out</a></li>
+    </ul>
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form action="/profile" method="post" enctype="multipart/form-data" class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Change photo</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body d-flex justify-content-between align-items-center">
+        <label class="btn btn-primary" for="inputImg">Upload Image</label>
+        <input class="d-none" type="file" name="avatar" id="inputImg">
+        <img id="IMGELEMENT" style="width: 150px; height: 150px; border-radius: 50%;" src="<%= user.profileImg?user.profileImg: "../img/avatar.png" %>" alt="photo">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  inputImg.addEventListener("change", (eo) => {
+    IMGELEMENT.src = URL.createObjectURL(eo.target.files[0])
+  })
+</script>

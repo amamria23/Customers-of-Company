@@ -5,7 +5,7 @@ const requireLogin = (req, res, next) => {
   const token = req.cookies.jwt;
 
   if (token) {
-    jwt.verify(token, "shhhhh", (err) => {
+    jwt.verify(token, process.env.user_secret, (err) => {
       if (err) {
         res.redirect("/login");
       } else {
@@ -20,7 +20,7 @@ const requireLogin = (req, res, next) => {
 const checkIfLogin = (req, res, next) => {
   const token = req.cookies.jwt;
   if (token) {
-    jwt.verify(token, "shhhhh", async (err, decoded) => {
+    jwt.verify(token, process.env.user_secret, async (err, decoded) => {
       if (err) {
         res.locals.user = null;
         next();

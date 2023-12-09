@@ -1,9 +1,15 @@
-const User = require("../models/customerSchema");
 const UserAuth = require("../models/userauth");
 const bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
-const { check, validationResult } = require("express-validator");
+const { validationResult } = require("express-validator");
 const moment = require("moment");
+require('dotenv').config()
+const cloudinary = require('cloudinary').v2
+cloudinary.config({ 
+  cloud_name: process.env.cloud_name, 
+  api_key: process.env.api_key, 
+  api_secret: process.env.api_secret 
+});
 var country_list = [
   "Afghanistan",
   "Albania",
@@ -212,12 +218,14 @@ var country_list = [
   "Zimbabwe",
 ];
 
+
 const user_index_get = (req, res) => {
-  User.find()
+  const decoded = jwt.verify(req.cookies.jwt, process.env.user_secret);
+  UserAuth.findById(decoded.id)
     .then((result) => {
       res.render("index.ejs", {
         mytitle: "home page",
-        user: result,
+        userCust: result.customerInfo,
         time: moment,
       });
     })
@@ -227,17 +235,16 @@ const user_index_get = (req, res) => {
 };
 
 const user_search_post = (req, res) => {
-  User.find({
-    $or: [
-      { FirstName: req.body.searchText },
-      { LastName: req.body.searchText },
-      { gender: req.body.searchText },
-    ],
-  })
+  const search = req.body.searchText.trim()
+  const decoded = jwt.verify(req.cookies.jwt, process.env.user_secret);
+  UserAuth.findOne({ _id: decoded.id })
     .then((result) => {
+      const serchCustomers = result.customerInfo.filter((item) => {
+        return item.FirstName.includes(search) || item.LastName.includes(search)
+      });
       res.render("user/search", {
         mytitle: "Search",
-        user: result,
+        user: serchCustomers,
         time: moment,
       });
     })
@@ -247,10 +254,13 @@ const user_search_post = (req, res) => {
 };
 
 const user_view_get = (req, res) => {
-  User.findById(req.params.id)
+  UserAuth.findOne({ "customerInfo._id": req.params.id })
     .then((result) => {
+      const oneCustomerInfo = result.customerInfo.find((item) => {
+        return item._id == req.params.id;
+      });
       res.render("user/view.ejs", {
-        oneUser: result,
+        oneUser: oneCustomerInfo,
         time: moment,
         title: "view customer",
       });
@@ -265,7 +275,17 @@ const user_add_get = (req, res) => {
 };
 
 const user_post = (req, res) => {
-  User.create(req.body)
+  const decoded = jwt.verify(req.cookies.jwt, process.env.user_secret);
+  UserAuth.updateOne({ _id: decoded.id }, { $push: { customerInfo: {
+    FirstName: req.body.FirstName,
+    LastName: req.body.LastName,
+    Email: req.body.Email,
+    Telephone: req.body.Telephone,
+    Age: req.body.Age,
+    country: req.body.country,
+    gender: req.body.gender,
+    createdAt: new Date()
+  } } })
     .then(() => {
       res.redirect("/home");
     })
@@ -275,10 +295,13 @@ const user_post = (req, res) => {
 };
 
 const user_edit_get = (req, res) => {
-  User.findById(req.params.id)
+  UserAuth.findOne({ "customerInfo._id": req.params.id })
     .then((result) => {
+      const oneCustomerInfo = result.customerInfo.find((item) => {
+        return item._id == req.params.id;
+      });
       res.render("user/edit.ejs", {
-        oneUser: result,
+        oneUser: oneCustomerInfo,
         country: country_list,
         title: "edit user",
       });
@@ -289,13 +312,28 @@ const user_edit_get = (req, res) => {
 };
 
 const user_delete = (req, res) => {
-  User.deleteOne({ _id: req.params.id }).then((result) => {
+  UserAuth.updateOne(
+    { "customerInfo._id": req.params.id },
+    { $pull: { customerInfo: { _id: req.params.id } } }
+  ).then((result) => {
     res.redirect("/home");
   });
 };
 
 const user_put = (req, res) => {
-  User.updateOne({ _id: req.params.id }, req.body).then(() => {
+  UserAuth.updateOne(
+    { "customerInfo._id": req.params.id },
+    { 
+      "customerInfo.$.FirstName": req.body.FirstName,
+      "customerInfo.$.LastName": req.body.LastName,
+      "customerInfo.$.Email": req.body.Email,
+      "customerInfo.$.Telephone": req.body.Telephone,
+      "customerInfo.$.Age": req.body.Age,
+      "customerInfo.$.country": req.body.country,
+      "customerInfo.$.gender": req.body.gender,
+      "customerInfo.$.updateAt": new Date(),
+     }
+  ).then(() => {
     res.redirect("/home");
   });
 };
@@ -354,6 +392,21 @@ const user_login_post = async (req, res) => {
   }
 };
 
+const user_signout_get = (req, res) => {
+  res.cookie("jwt", "", { maxAge: 1 });
+  res.redirect("/");
+}
+
+const user_profile_post = (req, res) => {
+  cloudinary.uploader.upload(req.file.path,{folder:"X-system/User-img"},  async (error, result)=>{
+    if(result){
+      const decoded = jwt.verify(req.cookies.jwt, process.env.user_secret);
+      const uploadImg = await UserAuth.updateOne({_id: decoded.id}, {profileImg: result.secure_url})
+      res.redirect("/home")
+    }
+  });
+}
+
 module.exports = {
   user_index_get,
   user_search_post,
@@ -367,5 +420,7 @@ module.exports = {
   user_signup_get,
   user_signup_post,
   user_login_get,
-  user_login_post
+  user_login_post,
+  user_signout_get,
+  user_profile_post
 };

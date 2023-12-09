@@ -4,10 +4,12 @@ const userControllers = require("../controllers/userController");
 
 
 const { requireLogin, checkIfLogin } = require("../middleware/middleware");
-const { check } = require("express-validator");
+const { check} = require("express-validator");
 
 //get data from Mongo DB
 router.get("*", checkIfLogin);
+router.get("/home", checkIfLogin);
+router.post("*", checkIfLogin);
 
 //welcome page
 router.get("", userControllers.user_welcome_get);
@@ -49,9 +51,14 @@ router.post("/search", requireLogin, userControllers.user_search_post);
 router.get("/view/:id", requireLogin, userControllers.user_view_get);
 
 //sign out
-router.get("/signout", (req, res) => {
-  res.cookie("jwt", "", { maxAge: 1 });
-  res.redirect("/");
-});
+router.get("/signout", userControllers.user_signout_get);
+
+
+//upload img to cloudinary and mongodb
+
+const multer  = require('multer')
+const upload = multer({storage: multer.diskStorage({})});
+
+router.post('/profile', upload.single('avatar'),  userControllers.user_profile_post)
 
 module.exports = router;
